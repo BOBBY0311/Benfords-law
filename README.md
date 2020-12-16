@@ -9,7 +9,7 @@ Steps
 3. Click the Analyze button
 4. Enjoy the Visual comparing your population to Benford's Law
 
-For a quick explanation of Benford's Law and its uses for fraud analysis visit wikipedia https://en.wikipedia.org/wiki/Benford%27s_law
+For a quick explanation of Benford's Law and its uses for fraud analysis visit Wikipedia https://en.wikipedia.org/wiki/Benford%27s_law
 
 Future enhancements
 1. Export dataframe of counts and percentages to Excel
