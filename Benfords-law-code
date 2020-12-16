@@ -34,7 +34,7 @@ def getExcel ():
 # on change dropdown value
 def change_dropdown(*args):
     print( tkvar.get() )
-# determines the leading digit then plots results compated to Benford's law
+# determines the leading digit then plots results compared to Benford's law
 def analyze ():
     global analyze
     #identify leading digit for each row
