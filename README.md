@@ -1,4 +1,4 @@
-# Benfords Law Analyis
+# Benford's Law Analysis
 
 First Public project!!
 
