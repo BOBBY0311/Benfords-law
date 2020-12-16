@@ -1,8 +1,11 @@
-from tkinter import *
 import tkinter as tk
 import pandas as pd
 from tkinter import filedialog
-import matplotlib.pyplot as plt
+from tkinter import *
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
+NavigationToolbar2Tk)
+
 
 #commands for importing excel and csv
 def getcsv ():
@@ -12,9 +15,8 @@ def getcsv ():
     df.index = df.index
     choices = df
     popupMenu = OptionMenu(master, tkvar, *choices)
-    Label(master, text="Choose a Column for Analysis").grid(row = 1, column = 1)
-    popupMenu.grid(row = 2, column =1)
-    print (tkvar)
+    Label(master, text="Choose a Column for Analysis").grid(row = 0, column = 3)
+    popupMenu.grid(row = 1, column =3)
 
 def getExcel ():
     global df
@@ -25,8 +27,8 @@ def getExcel ():
     data=pd.DataFrame(df)
     choices = df
     popupMenu = OptionMenu(master, tkvar, *choices)
-    Label(master, text="Choose a Column for Analysis").grid(row = 1, column = 1)
-    popupMenu.grid(row = 2, column =1)
+    Label(master, text="Choose a Column for Analysis").grid(row = 0, column = 3)
+    popupMenu.grid(row = 1, column =3)
     print (tkvar)
 
 # on change dropdown value
@@ -37,30 +39,38 @@ def analyze ():
     global analyze
     #identify leading digit for each row
     df['Leading Digit']= df[tkvar.get()].astype(str).str[0]
-
     total_count=df['Leading Digit'].count()
-
     summary_pop=df.groupby('Leading Digit').agg(
-        # Get max of the count column for each group
+    # Get max of the count column for each group
         Counts=(tkvar.get(), 'count' ))
-    #summary_pop['Percentage']=summary_pop['Count'].value_counts(normalize=True)
+    #Create percentage for leading digit from total summary population
     summary_pop['Percentage']=summary_pop['Counts']/total_count
-
     print(summary_pop)
-
     Analysis_data=benford_df.merge(summary_pop, left_on='Leading Digit', right_on='Leading Digit')
     Analysis_data.rename(columns = {'Percentage_x':"Benford's Law"}, inplace = True)
     Analysis_data.rename(columns = {'Percentage_y':"Population"}, inplace = True)
     print(Analysis_data)
-    Analysis_data.set_index('Leading Digit',drop=True,inplace=True)
-    plt.plot(Analysis_data["Benford's Law"],label="Benford's Law")
-    plt.plot(Analysis_data['Population'],label="Population")
-    plt.ylabel("Distribution")
-    plt.xlabel("Leading Digit")
-    plt.title("Benford's Law Analysis")
-    plt.legend(loc='upper right')
+    #Analysis_data.set_index('Leading Digit',drop=True,inplace=True)
+    #plt.plot(Analysis_data["Benford's Law"],label="Benford's Law")
+    #plt.plot(Analysis_data['Population'],label="Population")
+    #plt.ylabel("Distribution")
+    #plt.xlabel("Leading Digit")
+    #plt.title("Benford's Law Analysis")
+    #plt.legend(loc='upper right')
+    #plt.show()
+    # the figure that will contain the plot
+    fig = Figure(figsize = (5, 5),dpi=100)
+    # adding the subplot
+    ax = fig.add_subplot(111)
 
-    plt.show()
+    Analysis_data.plot(x = 'Leading Digit', y = 'Population', title= "Benford's Law Analysis", ylabel="Distribution", ax=ax)
+    Analysis_data.plot(x = 'Leading Digit', y = "Benford's Law", ax=ax)
+    # creating the Tkinter canvas
+	# containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig,master=master)
+    canvas.draw()
+    # placing the canvas on the Tkinter window
+    canvas.get_tk_widget().grid(row= 3, column=1,columnspan=5)
 
 #percentages came from wikipedia https://en.wikipedia.org/wiki/Benford%27s_law
 benford_percentages = {'Leading Digit': ['1','2','3','4','5','6','7','8','9'], 'Percentage': [0.301,0.176,0.125,0.097,0.079,0.067,0.058,0.051,0.046]}
@@ -69,24 +79,44 @@ benford_df = pd.DataFrame(data=benford_percentages)
 #Create form layout and buttons
 master = tk.Tk()
 
+# dimensions of the main window
+master.geometry("550x600")
+# setting the title
 master.title("Benford's Law")
 
-tk.Button(text='Import CSV File',command=getcsv).grid(
-            row=0,column=1,sticky=tk.W,pady=4)
-tk.Button(text='Import Excel File',command=getExcel).grid(
-            row=0,column=2,sticky=tk.W,pady=4)
 
-tk.Button(master,
-          text='Analyze',command=analyze).grid(
-              row=5,column=1,sticky=tk.W,pady=4)
-tk.Button(master,
-          text='Close Program',command=master.destroy).grid(
-            row=5,column=2,sticky=tk.W,pady=4)
+csv_button = Button(master = master,
+					command = getcsv,
+					height = 2,
+					text = 'Import CSV File')
+csv_button.grid(row=0,column=1)
+
+excel_button = Button(master = master,
+					command = getExcel,
+					height = 2,
+					text = 'Import Excel File')
+excel_button.grid(row=0, column=2)
+
+
+
+analyze_button = Button(master = master,
+					command = analyze,
+					height = 2,
+					text = 'Analyze')
+analyze_button.grid(row=0,column=4)
+
+close_button = Button(master = master,
+					command = master.destroy,
+					height = 2,
+					text = 'Close Program')
+close_button.grid(row=0,column=5)
+
 
 # Create a Tkinter variable
 tkvar = StringVar(master)
 
 # link function to change dropdown
 tkvar.trace('w', change_dropdown)
+
 
 tk.mainloop()
