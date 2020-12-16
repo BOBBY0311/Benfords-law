@@ -15,3 +15,6 @@ Future enhancements
 1. Export dataframe of counts and percentages to Excel
 2. Add table of values below chart
 3. Automatically ID outliers (differences over a specific threshold  or Max/Min differences)
+
+
+Just want to shout out to all the heroes posting guides and examples on the web.
